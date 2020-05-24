@@ -16,6 +16,9 @@ public class Player : MonoBehaviour
     [SerializeField]float controlRollFactor = -20f;
 
     float xThrow, yThrow;
+    bool IsControllerEnabled = true;
+
+    [SerializeField] GameObject[] guns;
 
     void Start()
     {
@@ -25,8 +28,18 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        ProcessTranslation();
-        ProcessRotation();
+        if(IsControllerEnabled == true)
+        {
+            ProcessTranslation();
+            ProcessRotation();
+            ProcessFiring();
+        }
+       
+    }
+
+    void OnPlayerDeath()
+    {
+        IsControllerEnabled = false;
     }
 
     private void ProcessRotation()
@@ -59,4 +72,29 @@ public class Player : MonoBehaviour
 
         transform.localPosition = new Vector3(clampedXPos, clampedYPos, transform.localPosition.z);
     }
+
+    void ProcessFiring()
+    {
+        if(CrossPlatformInputManager.GetButton("Fire1"))
+        {
+            SetGunActive(true);
+        }
+
+        else
+        {
+            SetGunActive(false);
+        }
+    }
+
+
+    private void SetGunActive(bool isactive)
+    {
+        foreach (GameObject gun in guns)
+        {
+            var emissionModule = gun.GetComponent<ParticleSystem>().emission;
+            emissionModule.enabled = isactive;
+
+        }
+    }
+
 }
